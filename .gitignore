@@ -1,0 +1,14 @@
+# Data directories
+data/
+results/
+work/
+
+# Hidden files and directories
+.*
+!.gitignore
+
+# Common files to ignore
+*.log
+*.tmp
+*.temp
+.nextflow*

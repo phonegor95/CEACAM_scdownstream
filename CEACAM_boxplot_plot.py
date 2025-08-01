@@ -20,27 +20,6 @@ print(adata.var.columns.tolist())
 print("\nObsm keys:")
 print(list(adata.obsm.keys()))
 
-# Create filename-safe version of celltypist labels
-# def clean_filename(name):
-#     name = str(name)
-#     # Replace forward slash and other problematic characters
-#     name = name.replace('/', '_')
-#     name = name.replace('+', 'pos')
-#     name = name.replace('-', 'neg')
-#     name = re.sub(r'[\\:*?"<>|]', '_', name)
-#     return name
-
-# adata.obs['celltypist_clean'] = adata.obs['celltypist:Human_PF_Lung'].apply(clean_filename)
-
-# # Show the mapping
-# print("Label mapping:")
-# mapping = dict(zip(adata.obs['celltypist:Human_PF_Lung'].unique(), 
-#                   adata.obs['celltypist_clean'].unique()))
-# for orig, clean in mapping.items():
-#     print(f"'{orig}' -> '{clean}'")
-
-# adata.write_h5ad("results/finalized/merged_cleaned.h5ad")
-
 # Create disease status grouping
 def get_disease_status(batch):
     if 'NOR' in batch:
@@ -68,23 +47,8 @@ df_ceacam6 = df_ceacam6[df_ceacam6['disease_status'].isin(['Normal', 'Disease'])
 
 # Filter cell types with sufficient cells
 celltype_counts = df_ceacam6['celltype'].value_counts()
-print(f"Cell type counts:\n{celltype_counts}")
 valid_celltypes = celltype_counts[celltype_counts >= 50].index
 df_ceacam6 = df_ceacam6[df_ceacam6['celltype'].isin(valid_celltypes)]
-
-# Option 1: Use violinplot with a wider width
-sns.violinplot(data=df_ceacam6, x='celltype', y='expression', hue='disease_status', 
-               ax=axes[0], split=False, inner='quart', width=0.8, linewidth=1.5)
-axes[0].set_title('CEACAM6 Expression: Normal vs Disease', fontsize=16)
-axes[0].tick_params(axis='x', rotation=45, labelsize=12)
-axes[0].tick_params(axis='y', labelsize=12)
-
-# Option 2: Use boxplot instead for sparse data
-sns.boxplot(data=df_ceacam6, x='celltype', y='expression', hue='disease_status', 
-            ax=axes[0], width=0.8, linewidth=1.5)
-axes[0].set_title('CEACAM6 Expression: Normal vs Disease', fontsize=16)
-axes[0].tick_params(axis='x', rotation=45, labelsize=12)
-axes[0].tick_params(axis='y', labelsize=12)
 
 # CEACAM5 - same filtering
 df_ceacam5 = pd.DataFrame({
@@ -93,45 +57,9 @@ df_ceacam5 = pd.DataFrame({
     'disease_status': adata.obs['disease_status']
 })
 df_ceacam5 = df_ceacam5[df_ceacam5['disease_status'].isin(['Normal', 'Disease'])]
+celltype_counts = df_ceacam5['celltype'].value_counts()
+valid_celltypes = celltype_counts[celltype_counts >= 50].index
 df_ceacam5 = df_ceacam5[df_ceacam5['celltype'].isin(valid_celltypes)]
-
-sns.boxplot(data=df_ceacam5, x='celltype', y='expression', hue='disease_status',
-            ax=axes[1], width=0.8, linewidth=1.5)
-axes[1].set_title('CEACAM5 Expression: Normal vs Disease', fontsize=16)
-axes[1].tick_params(axis='x', rotation=45, labelsize=12)
-axes[1].tick_params(axis='y', labelsize=12)
-
-plt.tight_layout()
-plt.savefig('CEACAM_dodged_boxplots.png', dpi=300, bbox_inches='tight')
-plt.show()
-
-# CEACAM6 separate plot with better label handling
-fig, ax = plt.subplots(1, 1, figsize=(25, 10))
-sns.boxplot(data=df_ceacam6, x='celltype', y='expression', hue='disease_status', 
-            ax=ax, width=0.8, linewidth=1.5)
-ax.set_title('CEACAM6 Expression: Normal vs Disease', fontsize=16)
-ax.tick_params(axis='x', rotation=90, labelsize=10)  # Vertical rotation
-ax.tick_params(axis='y', labelsize=12)
-ax.set_xlabel('Cell Type', fontsize=14)
-ax.set_ylabel('Expression', fontsize=14)
-plt.tight_layout()
-plt.subplots_adjust(bottom=0.25)  # Add more space for labels
-plt.savefig('CEACAM6_boxplot.png', dpi=300, bbox_inches='tight')
-plt.show()
-
-# CEACAM5 separate plot with better label handling
-fig, ax = plt.subplots(1, 1, figsize=(25, 10))
-sns.boxplot(data=df_ceacam5, x='celltype', y='expression', hue='disease_status',
-            ax=ax, width=0.8, linewidth=1.5)
-ax.set_title('CEACAM5 Expression: Normal vs Disease', fontsize=16)
-ax.tick_params(axis='x', rotation=90, labelsize=10)  # Vertical rotation
-ax.tick_params(axis='y', labelsize=12)
-ax.set_xlabel('Cell Type', fontsize=14)
-ax.set_ylabel('Expression', fontsize=14)
-plt.tight_layout()
-plt.subplots_adjust(bottom=0.25)  # Add more space for labels
-plt.savefig('CEACAM5_boxplot.png', dpi=300, bbox_inches='tight')
-plt.show()
 
 def add_stat_annotation(ax, data, x_col, y_col, hue_col, test='mannwhitneyu'):
     """Add statistical significance annotations to cell type labels"""

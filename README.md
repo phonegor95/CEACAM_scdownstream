@@ -1,10 +1,9 @@
 # CEACAM_scdownstream
 
-### GSE128169 _matrix.mtx.gz 转成 rds (nf-core/scdownstream 输入格式之一)
+##### GSE128169 _matrix.mtx.gz 转成 rds (nf-core/scdownstream 输入格式之一)
 ```R
 Rscript mtx2rds.R
 ```
-### 运行 nf-core/scdownstream 流程
 ##### 准备samplesheet.csv, executor.config
 ```bash
 samplesheet.csv
